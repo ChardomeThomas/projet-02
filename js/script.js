@@ -1,127 +1,155 @@
 document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      height:350,
-      event:'./php/fetchEvents.php',
-      selectable: true,
-      select: async function (debut, fin, allDay){
-        const {value: formValues} = await Swal.fire({
-          title: "ajouter un évènement",
-          confirmButtonText: 'valider',
-          showCloseButton: true,
-          showCancelButton: true,
-          html:
-            // '<input id="Titre" class="swal2-input" placeholder="Ajouter un évènement">' +
-            '<input id="Nom" class="swal2-input" placeholder="Entrez votre nom">' +
-            '<input id="Prenom" class="swal2-input" placeholder="Entrez votre prénom">' +
-            '<input id="Mail" class="swal2-input" placeholder="Entrez votre e-mail">'+
-            '<input id="Telephone" class="swal2-input" placeholder="Entrez votre téléphone">'+
-            '<input id="Nb_personnes" class="swal2-input" placeholder="Pour combien de personnes réservez-vous?">',
-          focusConfirm: false,
-          preConfirm: () => {
-            return [
-              // document.getElementById('Titre').value,
-              document.getElementById('Nom').value,
-              document.getElementById('Prenom').value,
-              document.getElementById('Mail').value,
-              document.getElementById('Telephone').value,
-              document.getElementById('Nb_personnes').value
-            ];
-          }
-        });
+  var calendarEl = document.getElementById('calendar');
 
-        if (formValues){
-          //ajout event
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    height: 650,
+    events: './php/fetchEvents.php',
+    
+    selectable: true,
+    select: async function (start, end, allDay) {
+      const { value: formValues } = await Swal.fire({
+        title: 'Add Event',
+        confirmButtonText: 'Submit',
+        showCloseButton: true,
+		    showCancelButton: true,
+        html:
+          '<input id="swalEvtTitle" class="swal2-input" placeholder="Enter title">' +
+          // '<textarea id="swalEvtDesc" class="swal2-input" placeholder="Enter description"></textarea>' +
+          // '<input id="swalEvtURL" class="swal2-input" placeholder="Enter URL">'+
+          '<input id="Nom" class="swal2-input" placeholder="Entrez votre nom">'+
+          '<input id="Prenom" class="swal2-input" placeholder="Entrez votre prenom">'+
+          '<input id="Email" class="swal2-input" placeholder="Entrez votre e-mail">'+
+          '<input id="Telephone" class="swal2-input" placeholder="Entrez votre telephone">'+
+          '<input id="Personnes" class="swal2-input" placeholder="Entrez le nombre de personnes">',
+        focusConfirm: false,
+        preConfirm: () => {
+          return [
+            document.getElementById('swalEvtTitle').value,
+            // document.getElementById('swalEvtDesc').value,
+            // document.getElementById('swalEvtURL').value,
+            document.getElementById('Nom').value,
+            document.getElementById('Prenom').value,
+            document.getElementById('Email').value,
+            document.getElementById('Telephone').value,
+            document.getElementById('Personnes').value
+          ]
+        }
+      });
+
+      if (formValues) {
+        // Add event
+        fetch("./php/eventHandler.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ request_type:'addEvent', start:start.startStr, end:start.endStr, event_data: formValues}),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status == 1) {
+            Swal.fire('Event added successfully!', '', 'success');
+          } else {
+            Swal.fire(data.error, '', 'error');
+          }
+
+          // Refetch events from all sources and rerender
+          calendar.refetchEvents();
+        })
+        .catch(console.error);
+      }
+    },
+
+    eventClick: function(info) {
+      info.jsEvent.preventDefault();
+      
+      // change the border color
+      info.el.style.borderColor = 'red';
+      
+      Swal.fire({
+        title: info.event.title,
+        icon: 'info',
+        html:'<p>'+info.event.extendedProps.nom+'</p>'+'<p>'+info.event.extendedProps.prenom+'</p>'+'<p>'+info.event.extendedProps.email+'</p>'+'<p>'+info.event.extendedProps.telephone+'</p>'+'<p>'+info.event.extendedProps.personnes+'</p>',
+        showCloseButton: true,
+        showCancelButton: true,
+        showDenyButton: true,
+        cancelButtonText: 'Close',
+        confirmButtonText: 'Delete',
+        denyButtonText: 'Edit',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Delete event
           fetch("./php/eventHandler.php", {
             method: "POST",
-            header: { "Content-Type": "application/json"},
-            body: JSON.stringify({request_type:'addEvent', debut:debut.startStr, fin:debut.endStr, event_data: formValues}),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_type:'deleteEvent', event_id: info.event.id}),
           })
-          .then(response => {
-            console.log(response); // Affiche la réponse dans la console
-            return response.json();
-          })
+          .then(response => response.json())
           .then(data => {
-            if (data.status == 1){
-              Swal.fire('Evénement ajouté avec succès', '', 'success');
-            } else{
-              Swal.fire(data.error, '', 'error')
+            if (data.status == 1) {
+              Swal.fire('Event deleted successfully!', '', 'success');
+            } else {
+              Swal.fire(data.error, '', 'error');
             }
 
-            calendar.refecthEvents();
+            // Refetch events from all sources and rerender
+            calendar.refetchEvents();
           })
           .catch(console.error);
-        }
-
-        eventClick: function test(info) {
-          info.jsEvent.preventDefault();
-          
-          // change the border color
-          info.el.style.borderColor = 'red';
-          
+        } else if (result.isDenied) {
+          // Edit and update event
           Swal.fire({
-            title: info.event.title,
-            icon: 'info',
-            html:'<p>'+info.event.extendedProps.description+'</p><a href="'+info.event.url+'">Visit event page</a>',
-            showCloseButton: true,
-            showCancelButton: true,
-            cancelButtonText: 'close',
+            title: 'Edit Event',
+            html:
+              '<input id="swalEvtTitle_edit" class="swal2-input" placeholder="Enter title" value="'+info.event.title+'">' +
+              // '<textarea id="swalEvtDesc_edit" class="swal2-input" placeholder="Enter description">'+info.event.extendedProps.description+'</textarea>' +
+              // '<input id="swalEvtURL_edit" class="swal2-input" placeholder="Enter URL" value="'+info.event.url+'">'+
+              '<input id="swalNom_edit" class="swal2-input" placeholder="Enter Nom" value="'+info.event.extendedProps.nom+'">'+
+              '<input id="swalPrenom_edit" class="swal2-input" placeholder="Enter Prenom" value="'+info.event.extendedProps.prenom+'">'+
+              '<input id="swalEmail_edit" class="swal2-input" placeholder="Enter votre email" value="'+info.event.extendedProps.email+'">'+
+              '<input id="swalTelephone_edit" class="swal2-input" placeholder="Enter votre telephone" value="'+info.event.extendedProps.telephone+'">'+
+              '<input id="swalPersonnes_edit" class="swal2-input" placeholder="Enter le nombre de personnes" value="'+info.event.extendedProps.personnes+'">',
+            focusConfirm: false,
+            confirmButtonText: 'Submit',
+            preConfirm: () => {
+            return [
+              document.getElementById('swalEvtTitle_edit').value,
+              // document.getElementById('swalEvtDesc_edit').value,
+              // document.getElementById('swalEvtURL_edit').value,
+              document.getElementById('swalNom_edit').value,
+              document.getElementById('swalPrenom_edit').value,
+              document.getElementById('swalEmail_edit').value,
+              document.getElementById('swalTelephone_edit').value,
+              document.getElementById('swalPersonnes_edit').value
+            ]
+            }
+          }).then((result) => {
+            if (result.value) {
+              // Edit event
+              fetch("./php/eventHandler.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ request_type:'editEvent', start:info.event.startStr, end:info.event.endStr, event_id: info.event.id, event_data: result.value})
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.status == 1) {
+                  Swal.fire('Event updated successfully!', '', 'success');
+                } else {
+                  Swal.fire(data.error, '', 'error');
+                }
+
+                // Refetch events from all sources and rerender
+                calendar.refetchEvents();
+              })
+              .catch(console.error);
+            }
           });
+        } else {
+          Swal.close();
         }
-      },
-      // dateClick: function(info) {
-      //     alert('clicked ' + info.dateStr);
-          
-      //   },
-      //   select: function(info) {
-      //       alert('selected ' + info.startStr + ' to ' + info.endStr);
-      //   },
-    });
-    
-
-    calendar.render();
+      });
+    }
   });
 
-
-
-
-
-
-
-//   CALENDRIER 2
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl2 = document.getElementById('calendar2');
-    var calendar2 = new FullCalendar.Calendar(calendarEl2, {
-      initialView: 'dayGridMonth',
-      selectable: true,
-      dateClick: function(info) {
-        alert('clicked ' + info.dateStr);
-        
-      },
-      select: function(info) {
-        alert('selected ' + info.startStr + ' to ' + info.endStr);
-      },
-      height:350
-    });
-    calendar2.render();
-  });
-
-// CALENDRIER3
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl3 = document.getElementById('calendar3');
-    var calendar3 = new FullCalendar.Calendar(calendarEl3, {
-      initialView: 'dayGridMonth',
-      selectable: true,
-      dateClick: function(info) {
-        alert('clicked ' + info.dateStr);
-        
-      },
-      select: function(info) {
-        alert('selected ' + info.startStr + ' to ' + info.endStr);
-      },
-      height:350
-    });
-    calendar3.render();
-  });
-
+  calendar.render();
+});
