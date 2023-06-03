@@ -72,6 +72,13 @@ $("#login-submit").on("click", () => {
     $("#login-submit").val(`Login`)
     $(".login-input").show();
     $(".logout-input").hide();
+    $(".login-error").html(`
+                        <div id="myModal" class="modal-component pt-2">
+                            <div class="modal-content border border-warning p-2 text-center">
+                                <div>You are logged out!</div>
+                            </div>
+                        </div>
+                    `);
     $.post("php/api.php", { action: "logout" }, (data) => {
       console.log(data)
     })
