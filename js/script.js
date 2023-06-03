@@ -1,11 +1,41 @@
-document.addEventListener('DOMContentLoaded', function() {
-  var calendarEl = document.getElementById('calendar');
 
+// THOMAS : toute la journée du vendredi pour le calendrier
+//samedi: début modal calendrier en boostrap
+
+//permet de perdre le focus sur le modal bootstrap afin de pouvoir remplir les input du calendrier
+$.fn.modal.Constructor.prototype._enforceFocus = function() {};
+
+var chaletId;
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+
+  var buttons = document.querySelectorAll('.cal');
+  // Parcourez chaque bouton et ajoutez un gestionnaire d'événements click
+  buttons.forEach(function(button) {
+    button.addEventListener('click', function(event) {
+      // Récupérez l'attribut "data-id-calendar"
+      chaletId = button.getAttribute('data-id-calendar');
+
+      // Utilisez l'ID pour ajouter des informations ou effectuer d'autres opérations
+      console.log('Calendar ID:', chaletId);
+      event.test = chaletId;
+      // ... Autres actions à effectuer avec l'ID
+      console.log(event.test);
+      // Pour empêcher le comportement par défaut du bouton (comme la soumission de formulaire)
+      event.preventDefault();
+      
+    });
+  });
+
+  var calendarEl = document.getElementById('calendar');
+  
   var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    height: 650,
-    events: './php/fetchEvents.php',
     
+    initialView: 'dayGridMonth',
+    height: 350,
+    events: './php/fetchEvents.php',
+    eventColor: 'red',
     selectable: true,
     select: async function (start, end, allDay) {
       const { value: formValues } = await Swal.fire({
@@ -15,24 +45,31 @@ document.addEventListener('DOMContentLoaded', function() {
 		    showCancelButton: true,
         html:
           '<input id="swalEvtTitle" class="swal2-input" placeholder="Enter title">' +
-          // '<textarea id="swalEvtDesc" class="swal2-input" placeholder="Enter description"></textarea>' +
-          // '<input id="swalEvtURL" class="swal2-input" placeholder="Enter URL">'+
           '<input id="Nom" class="swal2-input" placeholder="Entrez votre nom">'+
           '<input id="Prenom" class="swal2-input" placeholder="Entrez votre prenom">'+
           '<input id="Email" class="swal2-input" placeholder="Entrez votre e-mail">'+
           '<input id="Telephone" class="swal2-input" placeholder="Entrez votre telephone">'+
-          '<input id="Personnes" class="swal2-input" placeholder="Entrez le nombre de personnes">',
+          '<input id="Personnes" class="swal2-input" placeholder="Entrez le nombre de personnes">'+
+          '<div>'+
+          '<input id="case1" type="checkbox"><span>breakfast</span>'+
+          '<input id="case2" type="checkbox"><span>dinner</span>'+
+          '<input id="case3" type="checkbox"><span>spa</span>'+
+          '</div>',
         focusConfirm: false,
         preConfirm: () => {
           return [
             document.getElementById('swalEvtTitle').value,
-            // document.getElementById('swalEvtDesc').value,
-            // document.getElementById('swalEvtURL').value,
             document.getElementById('Nom').value,
             document.getElementById('Prenom').value,
             document.getElementById('Email').value,
             document.getElementById('Telephone').value,
-            document.getElementById('Personnes').value
+            document.getElementById('Personnes').value,
+            chaletId,
+            document.getElementById("case1").checked,
+            document.getElementById("case2").checked,
+            document.getElementById("case3").checked,
+            
+            
           ]
         }
       });
@@ -61,14 +98,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     eventClick: function(info) {
       info.jsEvent.preventDefault();
-      
+      if(info.event.extendedProps.breakfast==1){
+        var breakf = true;
+      }else{
+        breakf = false;
+      }
+      if(info.event.extendedProps.dinner==1){
+        var din = true;
+      }else{
+        din = false;
+      }
+      if(info.event.extendedProps.spa==1){
+        var spa = true;
+      }else{
+        spa = false;
+      }
       // change the border color
       info.el.style.borderColor = 'red';
       
       Swal.fire({
         title: info.event.title,
         icon: 'info',
-        html:'<p>'+info.event.extendedProps.nom+'</p>'+'<p>'+info.event.extendedProps.prenom+'</p>'+'<p>'+info.event.extendedProps.email+'</p>'+'<p>'+info.event.extendedProps.telephone+'</p>'+'<p>'+info.event.extendedProps.personnes+'</p>',
+        html:`<p>${info.event.extendedProps.nom}</p><p>${info.event.extendedProps.prenom}</p><p>${info.event.extendedProps.email}</p><p>${info.event.extendedProps.telephone}</p><p>${info.event.extendedProps.personnes}</p><input disabled type="checkbox" ${breakf ? 'checked' : ''}><span>breakfast</span> <input disabled type="checkbox" ${din ? 'checked' : ''} ><span>dinner</span><input disabled type="checkbox" ${spa ? 'checked' : ''} ><span>spa</span>`,
         showCloseButton: true,
         showCancelButton: true,
         showDenyButton: true,
@@ -152,4 +203,18 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   calendar.render();
+
+
+  
+  $('#exampleModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var recipient = button.data('whatever') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('.modal-title').text('New message to ' + recipient)
+    modal.find('.modal-body input').val(recipient)
+  
+  })
 });
+
