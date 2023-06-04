@@ -12,11 +12,13 @@ $(document).ready(() => {
       if (data.session === "none") {
         $("#login-btn").html(`Login`)
         $("#login-submit").val(`Login`)
+        $("#modal-ctn").removeClass("modal-fullscreen")
         $(".login-input").show();
         $(".admin-view").hide();
       } else {
         $("#login-btn").html(`Admin view`)
         $("#login-submit").val(`Logout`)
+        $("#modal-ctn").addClass("modal-fullscreen")
         $(".login-input").show();
         $(".admin-view").hide();
       }
@@ -51,6 +53,7 @@ $("#login-submit").on("click", () => {
         } else {
           $("#login-btn").html(`Admin view`)
           $("#login-submit").val(`Logout`)
+          $("#modal-ctn").addClass("modal-fullscreen")
           $(".login-input").hide();
           $(".admin-view").show();
           adminView();
@@ -71,6 +74,7 @@ $("#login-submit").on("click", () => {
   else {
     $("#login-btn").html(`Login`)
     $("#login-submit").val(`Login`)
+    $("#modal-ctn").removeClass("modal-fullscreen")
     $(".login-input").show();
     $(".admin-view").hide();
 
@@ -115,6 +119,9 @@ const adminView = () => {
           <td>${rsv.email}</td>
           <td>${rsv.telephone}</td>
           <td>${rsv.personnes}</td>
+          <td><input class="form-check-input" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.breakfast ? "checked" : ""} disabled></td>
+          <td><input class="form-check-input" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.dinner ? "checked" : ""} disabled></td>
+          <td><input class="form-check-input" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.spa ? "checked" : ""} disabled></td>
           <td>${rsv.start}</td>
           <td>${rsv.creation_date}</td>
           <td>${rsv.status}</td>

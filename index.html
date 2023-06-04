@@ -46,7 +46,7 @@
         <!-- Login and Admin view -->
         <div class="modal fade" id="loginInterface" tabindex="-1" aria-labelledby="loginInterfaceLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-xl">
+            <div id="modal-ctn" class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="m-auto login-form">
@@ -108,13 +108,16 @@
                                             <th class="cursor-pointer" data-sort="nom">Lastname</th>
                                             <th class="cursor-pointer" data-sort="email">Email</th>
                                             <th class="cursor-pointer" data-sort="telephone">Phone</th>
-                                            <th class="cursor-pointer" data-sort="personnes">N° person</th>
+                                            <th class="cursor-pointer" data-sort="personnes">N° of person</th>
+                                            <th class="cursor-pointer" data-sort="breakfast">Breakfast</th>
+                                            <th class="cursor-pointer" data-sort="dinner">Dinner</th>
+                                            <th class="cursor-pointer" data-sort="spa">Spa</th>
                                             <th class="cursor-pointer" data-sort="start">Reservation Date</th>
                                             <th class="cursor-pointer" data-sort="creation_date">Creation Date</th>
                                             <th class="cursor-pointer" data-sort="status">Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="chalet-list overflow-auto" style="max-height: 50%;"></tbody>
+                                    <tbody class="chalet-list"></tbody>
                                 </table>
                             </div>
                         </div>

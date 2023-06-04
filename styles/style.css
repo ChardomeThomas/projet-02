@@ -1,3 +1,8 @@
 .cursor-pointer {
     cursor: pointer;
 }
+
+.table-overflow {
+    max-height: 20%;
+    overflow:scroll;
+}
