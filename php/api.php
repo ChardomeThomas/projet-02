@@ -1,14 +1,14 @@
 <?php
 session_start();
 
+require_once './includes/dbo.inc.php';
+require_once './includes/function.inc.php';
+
 switch ($_POST["action"]) {
         // Fred
     case "login":
         $username = $_POST["username"];
         $pwd = $_POST["pwd"];
-
-        require_once './includes/dbo.inc.php';
-        require_once './includes/function.inc.php';
 
         login($username, $pwd, $link);
         break;
@@ -23,6 +23,11 @@ switch ($_POST["action"]) {
             else if (isset($_COOKIE["id_user"]))
                 echo json_encode(array("session" => $_COOKIE["id_user"]), true);
         }
+        break;
+
+        // Fred
+    case "fetch":
+        fetchReservation($link);
         break;
 
         // Fred
