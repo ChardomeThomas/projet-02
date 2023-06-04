@@ -44,7 +44,9 @@ function hashUserPassword($user, $pass, $link)
 
 function fetchReservation($link)
 {
-    $req = $link->prepare("SELECT * FROM reservation");
+    $req = $link->prepare("SELECT *, c.name AS c_name FROM reservation AS r"
+        . " LEFT JOIN chalets AS c ON c.id = r.chalet_id"
+        . " LEFT JOIN reservation_status AS rs ON rs.id = r.status_id");
     $req->execute();
     $result = $req->get_result();
 

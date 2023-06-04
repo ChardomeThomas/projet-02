@@ -1,9 +1,8 @@
 const log = (string) => console.log(string);
 
 /**
- * Show login ou logout depending if the user is connected </br>
+ * Show login or logout depending on whether the user is connected </br>
  * and there's a session 
- * @author Fred
  */
 $(document).ready(() => {
   $.post(
@@ -16,7 +15,7 @@ $(document).ready(() => {
         $(".login-input").show();
         $(".admin-view").hide();
       } else {
-        $("#login-btn").html(`Logout`)
+        $("#login-btn").html(`Admin view`)
         $("#login-submit").val(`Logout`)
         $(".login-input").show();
         $(".admin-view").hide();
@@ -48,12 +47,14 @@ $("#login-submit").on("click", () => {
                             </div>
                         </div>
                     `);
+          $(".login-error").fadeIn().delay(3000).fadeOut();
         } else {
-          $("#login-btn").html(`Logout`)
+          $("#login-btn").html(`Admin view`)
           $("#login-submit").val(`Logout`)
           $(".login-input").hide();
           $(".admin-view").show();
           adminView();
+
           $(".login-error").html(`
                         <div id="myModal" class="modal-component pt-2">
                             <div class="modal-content border border-success p-2 text-center">
@@ -61,6 +62,7 @@ $("#login-submit").on("click", () => {
                             </div>
                         </div>
                     `);
+          $(".login-error").fadeIn().delay(3000).fadeOut();
         }
       },
       "json"
@@ -71,6 +73,7 @@ $("#login-submit").on("click", () => {
     $("#login-submit").val(`Login`)
     $(".login-input").show();
     $(".admin-view").hide();
+
     $(".login-error").html(`
                         <div id="myModal" class="modal-component pt-2">
                             <div class="modal-content border border-warning p-2 text-center">
@@ -78,19 +81,26 @@ $("#login-submit").on("click", () => {
                             </div>
                         </div>
                     `);
+    $(".login-error").fadeIn().delay(3000).fadeOut();
+
     $.post("php/api.php", { action: "logout" }, (data) => {
       console.log(data)
     })
   }
-})
+});
 
 /**
- * Admin interface with a list of all reservation </br>
- * as well as filters handlers
- * @author Fred
+ * Admin interface with a list of all reservations </br>
+ * as well as filter handlers
  */
 const adminView = () => {
   let reservations = [];
+  let sortOrders = {
+    start: "asc",
+    creation_date: "asc",
+    nom: "asc",
+    prenom: "asc",
+  };
 
   const renderTable = (filteredReservations) => {
     const tableBody = $(".chalet-list");
@@ -99,14 +109,15 @@ const adminView = () => {
     filteredReservations.map((rsv) => {
       tableBody.append(`
         <tr>
-          <td>${rsv.chalet_id}</td>
+          <td>${rsv.c_name}</td>
           <td>${rsv.prenom}</td>
           <td>${rsv.nom}</td>
           <td>${rsv.email}</td>
           <td>${rsv.telephone}</td>
           <td>${rsv.personnes}</td>
           <td>${rsv.start}</td>
-          <td>${rsv.status_id}</td>
+          <td>${rsv.creation_date}</td>
+          <td>${rsv.status}</td>
         </tr>
       `);
     });
@@ -115,55 +126,113 @@ const adminView = () => {
   /**
    * Filter reservations based on name or email
    * @param {*} searchTerm 
-   * @author Fred
    */
-  const filterReservations = (searchTerm) => {
+  const filterReservations = (searchTerm, chaletName, status) => {
     return reservations.filter((rsv) => {
-      const { nom, prenom, email } = rsv;
-      return (
+      const { nom, prenom, email, c_name, status: rsvStatus } = rsv;
+      const searchTermMatch =
         nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
         prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+        email.toLowerCase().includes(searchTerm.toLowerCase());
+      const chaletMatch = chaletName === "ALL" || c_name === chaletName;
+      const statusMatch = status === "ALL" || rsvStatus === status;
+  
+      return searchTermMatch && chaletMatch && statusMatch;
     });
   };
 
   /**
-   * Filter reservations based on star date
-   * @param {*} searchTerm 
-   * @author Fred
+   * Filter reservations based on chalet
+   * @param {*} chaletName 
    */
-  const sortReservations = (reservations, order) => {
+  const filterReservationsByChalet = (chaletName) => {
+    if (chaletName === "ALL") {
+      return reservations;
+    } else {
+      return reservations.filter((rsv) => {
+        return rsv.c_name === chaletName;
+      });
+    }
+  };
+
+  /**
+   * Filter reservations based on status
+   * @param {*} status 
+   */
+  const filterReservationsByStatus = (status) => {
+    if (status === "ALL") {
+      return reservations;
+    } else {
+      return reservations.filter((rsv) => {
+        return rsv.status === status;
+      });
+    }
+  };
+
+  /**
+   * Sort reservations based on clicked element
+   * @param {*} reservations 
+   * @param {*} sortBy 
+   * @param {*} order 
+   */
+  const sortReservations = (reservations, sortBy) => {
+    const currentOrder = sortOrders[sortBy];
+  
+    if (currentOrder === "asc") {
+      sortOrders[sortBy] = "desc";
+    } else {
+      sortOrders[sortBy] = "asc";
+    }
+  
     return reservations.sort((a, b) => {
-      const dateA = new Date(a.start);
-      const dateB = new Date(b.start);
-      if (order === "asc") {
-        return dateA - dateB;
+      const valueA = a[sortBy];
+      const valueB = b[sortBy];
+  
+      let comparisonResult;
+  
+      if (typeof valueA === "string" && typeof valueB === "string") {
+        comparisonResult = valueA.localeCompare(valueB);
+      } else if (typeof valueA === "number" && typeof valueB === "number") {
+        comparisonResult = valueA - valueB;
       } else {
-        return dateB - dateA;
+        comparisonResult = String(valueA).localeCompare(String(valueB));
       }
+  
+      return currentOrder === "asc" ? comparisonResult : -comparisonResult;
     });
   };
 
-  // fetch chalet list and then appy filter
+
+  // Fetch chalet list and then apply filters
   $.post("php/api.php", { action: "fetch" }, (data) => {
     reservations = data.rsv;
     renderTable(reservations);
   }, "json");
 
-  $("#filter-input").on("input", () => {
-    const searchTerm = $("#filter-input").val().trim();
-    const filteredReservations = filterReservations(searchTerm);
-    const order = $("#order-select").val();
-    const sortedReservations = sortReservations(filteredReservations, order);
-    renderTable(sortedReservations);
-  });
+const applyFilter = (sortBy) => {
+  const searchTerm = $("#filter-input").val().trim();
+  const chaletName = $("#chalet-filter").val().trim();
+  const status = $("#status-filter").val().trim();
 
-  $("#order-select").on("change", () => {
-    const searchTerm = $("#filter-input").val().trim();
-    const filteredReservations = filterReservations(searchTerm);
-    const order = $("#order-select").val();
-    const sortedReservations = sortReservations(filteredReservations, order);
-    renderTable(sortedReservations);
+  const filteredReservations = filterReservations(searchTerm, chaletName, status);
+  const sortedReservations = sortReservations(filteredReservations, sortBy);
+  renderTable(sortedReservations);
+};
+  
+  $("#filter-input").on("input", () => {
+    applyFilter();
+  });
+  
+  $("#chalet-filter").on("change", () => {
+    applyFilter();
+  });
+  
+  $("#status-filter").on("change", () => {
+    applyFilter();
+  });
+  
+  $("th").on("click", function () {
+    const sortBy = $(this).data("sort");
+    applyFilter(sortBy);
   });
 };

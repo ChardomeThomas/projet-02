@@ -30,7 +30,7 @@
     <!-- sweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./styles/style.css">
 
     <title>Chalet</title>
 </head>
@@ -38,15 +38,15 @@
 <body>
     <header>
         <!-- Login button -->
-        <button id="login-btn" type="button" class="btn btn-primary" data-bs-toggle="modal"
+        <button id="login-btn" type="button" class="btn btn-primary m-2" data-bs-toggle="modal"
             data-bs-target="#loginInterface">
             Login
         </button>
 
-        <!-- Popup login -->
+        <!-- Login and Admin view -->
         <div class="modal fade" id="loginInterface" tabindex="-1" aria-labelledby="loginInterfaceLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="m-auto login-form">
@@ -62,56 +62,72 @@
                                 <input type="password" class="form-control" id="pwd" name="pwd" placeholder="Password">
                             </div>
 
+                            <!-- Error message container -->
+                            <div class="login-error fw-bold "></div>
+
                             <div class="form-group admin-view pt-1">
-                                <!-- Filters -->
-                                <div class="form-group pt-1">
-                                    <label for="filter-input">Filter By:</label>
-                                    <input type="text" class="form-control" id="filter-input"
-                                        placeholder="Filter by name or email">
-                                </div>
-    
-                                <!-- Order By Date -->
-                                <div class="form-group pt-1">
-                                    <label for="order-select">Order By Date:</label>
-                                    <select id="order-select" class="form-control">
-                                        <option value="asc">Ascending</option>
-                                        <option value="desc">Descending</option>
-                                    </select>
-                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <!-- Filters -->
+                                    <div class="form-group pt-1">
+                                        <label for="filter-input">Filter By:</label>
+                                        <input type="text" class="form-control" id="filter-input"
+                                            placeholder="Filter by name or email">
+                                    </div>
+
+                                    <!-- Chalet Name Filter -->
+                                    <div class="form-group pt-1">
+                                        <label for="chalet-filter">Filter by Chalet:</label>
+                                        <select id="chalet-filter" class="form-control">
+                                            <option value="ALL">All</option>
+                                            <option value="Rustic Wilderness Hideaway Chalet">Rustic Wilderness Hideaway
+                                                Chalet</option>
+                                            <option value="Lakeside Luxury Chalet">Lakeside Luxury Chalet</option>
+                                            <option value="Cozy Mountain Retreat Chalet">Cozy Mountain Retreat Chalet
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Status Filter -->
+                                    <div class="form-group pt-1">
+                                        <label for="status-filter">Filter by Status:</label>
+                                        <select id="status-filter" class="form-control">
+                                            <option value="ALL">All</option>
+                                            <option value="waiting">Waiting</option>
+                                            <option value="confirmed">Confirmed</option>
+                                            <option value="payed">Payed</option>
+                                            <option value="canceled">Canceled</option>
+                                        </select>
+                                    </div>
+
+                                <!-- Chalet resrvation list -->
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Chalet</th>
-                                            <th scope="col">Firstname</th>
-                                            <th scope="col">Lastname</th>
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Phone</th>
-                                            <th scope="col">N° person</th>
-                                            <th scope="col">Reservation</th>
-                                            <th scope="col">Status</th>
+                                            <th class="cursor-pointer" data-sort="c_name">Chalet</th>
+                                            <th class="cursor-pointer" data-sort="prenom">Firstname</th>
+                                            <th class="cursor-pointer" data-sort="nom">Lastname</th>
+                                            <th class="cursor-pointer" data-sort="email">Email</th>
+                                            <th class="cursor-pointer" data-sort="telephone">Phone</th>
+                                            <th class="cursor-pointer" data-sort="personnes">N° person</th>
+                                            <th class="cursor-pointer" data-sort="start">Reservation Date</th>
+                                            <th class="cursor-pointer" data-sort="creation_date">Creation Date</th>
+                                            <th class="cursor-pointer" data-sort="status">Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="chalet-list overflow-auto h-75"></tbody>
+                                    <tbody class="chalet-list overflow-auto" style="max-height: 50%;"></tbody>
                                 </table>
                             </div>
-                            <div class="login-error"></div>
-
                         </div>
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <input type="submit" id="login-submit" type="button" class="btn btn-primary"
-                                value="Login"></input>
+                            <input type="submit" id="login-submit" type="button" class="btn btn-primary" value="Login">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </header>
-    <div>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim vitae, nesciunt officia pariatur, ad aliquid
-            atque nam ut commodi quae quisquam delectus nemo, modi in maxime facilis. Enim, aliquam quos?</p>
-    </div>
 
 
     <div class="chalet-card-ctn"></div>
