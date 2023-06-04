@@ -5,7 +5,7 @@
 $.fn.modal.Constructor.prototype._enforceFocus = function() {};
 
 var chaletId;
-let isAdmin = true;
+let isAdmin = false;
 let testCouleur;
 // var today = new Date().toISOString().slice(0,10);
 document.addEventListener('DOMContentLoaded', function() {
@@ -125,16 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
     },
 
     eventClick: function(info) {
-      var eventsOnSameDay = calendar.getEvents().filter(function(event) {
-        return event.start.toISOString().slice(0, 10) === info.event.start.toISOString().slice(0, 10);
-      });
-    
-      if (eventsOnSameDay.length >= 3) {
-        // Afficher un message d'erreur lorsque trois événements sont présents sur la même journée
-        Swal.fire('Impossible de sélectionner cette case. Trois événements sont déjà présents sur cette journée.', '', 'error');
-        return false; // Annuler l'action par défaut
-      }
-    
+     
       // Le code restant pour afficher les détails de l'événement lorsque moins de trois événements sont présents
       info.jsEvent.preventDefault();
       // ...
