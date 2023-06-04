@@ -69,17 +69,17 @@ document.addEventListener('DOMContentLoaded', function() {
     select: async function (start, end, allDay) {
       
       const { value: formValues } = await Swal.fire({
-        title: 'Add Event',
+        title: 'Remplissez vos informations',
         confirmButtonText: 'Submit',
         showCloseButton: true,
         showCancelButton: true,
         html:
-          '<input id="swalEvtTitle" class="swal2-input" placeholder="Enter title">' +
+          '<input id="swalEvtTitle" class="swal2-input" placeholder="Entrez un nom pour votre réservation">' +
           '<input id="Nom" class="swal2-input" placeholder="Entrez votre nom">'+
           '<input id="Prenom" class="swal2-input" placeholder="Entrez votre prenom">'+
           '<input id="Email" class="swal2-input" placeholder="Entrez votre e-mail">'+
           '<input id="Telephone" class="swal2-input" placeholder="Entrez votre telephone">'+
-          '<input id="Personnes" class="swal2-input" placeholder="Entrez le nombre de personnes">'+
+          '<input id="Personnes" class="swal2-input" placeholder="Combien de personnes?">'+
           '<div>'+
           '<input id="case1" type="checkbox"><span>breakfast</span>'+
           '<input id="case2" type="checkbox"><span>dinner</span>'+
@@ -194,12 +194,12 @@ document.addEventListener('DOMContentLoaded', function() {
           Swal.fire({
             title: 'Edit Event',
             html:
-              '<input id="swalEvtTitle_edit" class="swal2-input" placeholder="Enter title" value="'+info.event.title+'">' +
-              '<input id="swalNom_edit" class="swal2-input" placeholder="Enter Nom" value="'+info.event.extendedProps.nom+'">'+
-              '<input id="swalPrenom_edit" class="swal2-input" placeholder="Enter Prenom" value="'+info.event.extendedProps.prenom+'">'+
-              '<input id="swalEmail_edit" class="swal2-input" placeholder="Enter votre email" value="'+info.event.extendedProps.email+'">'+
-              '<input id="swalTelephone_edit" class="swal2-input" placeholder="Enter votre telephone" value="'+info.event.extendedProps.telephone+'">'+
-              '<input id="swalPersonnes_edit" class="swal2-input" placeholder="Enter le nombre de personnes" value="'+info.event.extendedProps.personnes+'">'+
+              '<input id="swalEvtTitle_edit" class="swal2-input" placeholder="Entrez un nom pour votre réservation" value="'+info.event.title+'">' +
+              '<input id="swalNom_edit" class="swal2-input" placeholder="Nom" value="'+info.event.extendedProps.nom+'">'+
+              '<input id="swalPrenom_edit" class="swal2-input" placeholder="Prenom" value="'+info.event.extendedProps.prenom+'">'+
+              '<input id="swalEmail_edit" class="swal2-input" placeholder="Email" value="'+info.event.extendedProps.email+'">'+
+              '<input id="swalTelephone_edit" class="swal2-input" placeholder="Telephone" value="'+info.event.extendedProps.telephone+'">'+
+              '<input id="swalPersonnes_edit" class="swal2-input" placeholder="Combien serez-vous?" value="'+info.event.extendedProps.personnes+'">'+
               '<input id="swalStart" type="date" id="start" name="trip-start value="'+info.event.start+'>'+
               '<input id="swalEnd" type="date" id="start" name="trip-start value="'+info.event.end+'>'+
               // '<input id="swalStatus" class="swal2-input" placeholder="choisissez le status" value="'+info.event.extendedProps.status_id+'">',
