@@ -1,6 +1,4 @@
-const log = (string) => {
-  console.log(string);
-}
+const log = (string) => console.log(string);
 
 /**
  * Show login ou logout depending if the user is connected </br>
@@ -16,12 +14,12 @@ $(document).ready(() => {
         $("#login-btn").html(`Login`)
         $("#login-submit").val(`Login`)
         $(".login-input").show();
-        $(".logout-input").hide();
+        $(".admin-view").hide();
       } else {
         $("#login-btn").html(`Logout`)
         $("#login-submit").val(`Logout`)
         $(".login-input").show();
-        $(".logout-input").hide();
+        $(".admin-view").hide();
       }
     },
     "json"
@@ -54,7 +52,8 @@ $("#login-submit").on("click", () => {
           $("#login-btn").html(`Logout`)
           $("#login-submit").val(`Logout`)
           $(".login-input").hide();
-          $(".logout-input").show();
+          $(".admin-view").show();
+          adminView();
           $(".login-error").html(`
                         <div id="myModal" class="modal-component pt-2">
                             <div class="modal-content border border-success p-2 text-center">
@@ -71,7 +70,7 @@ $("#login-submit").on("click", () => {
     $("#login-btn").html(`Login`)
     $("#login-submit").val(`Login`)
     $(".login-input").show();
-    $(".logout-input").hide();
+    $(".admin-view").hide();
     $(".login-error").html(`
                         <div id="myModal" class="modal-component pt-2">
                             <div class="modal-content border border-warning p-2 text-center">
@@ -84,3 +83,87 @@ $("#login-submit").on("click", () => {
     })
   }
 })
+
+/**
+ * Admin interface with a list of all reservation </br>
+ * as well as filters handlers
+ * @author Fred
+ */
+const adminView = () => {
+  let reservations = [];
+
+  const renderTable = (filteredReservations) => {
+    const tableBody = $(".chalet-list");
+    tableBody.empty();
+
+    filteredReservations.map((rsv) => {
+      tableBody.append(`
+        <tr>
+          <td>${rsv.chalet_id}</td>
+          <td>${rsv.prenom}</td>
+          <td>${rsv.nom}</td>
+          <td>${rsv.email}</td>
+          <td>${rsv.telephone}</td>
+          <td>${rsv.personnes}</td>
+          <td>${rsv.start}</td>
+          <td>${rsv.status_id}</td>
+        </tr>
+      `);
+    });
+  };
+
+  /**
+   * Filter reservations based on name or email
+   * @param {*} searchTerm 
+   * @author Fred
+   */
+  const filterReservations = (searchTerm) => {
+    return reservations.filter((rsv) => {
+      const { nom, prenom, email } = rsv;
+      return (
+        nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+  };
+
+  /**
+   * Filter reservations based on star date
+   * @param {*} searchTerm 
+   * @author Fred
+   */
+  const sortReservations = (reservations, order) => {
+    return reservations.sort((a, b) => {
+      const dateA = new Date(a.start);
+      const dateB = new Date(b.start);
+      if (order === "asc") {
+        return dateA - dateB;
+      } else {
+        return dateB - dateA;
+      }
+    });
+  };
+
+  // fetch chalet list and then appy filter
+  $.post("php/api.php", { action: "fetch" }, (data) => {
+    reservations = data.rsv;
+    renderTable(reservations);
+  }, "json");
+
+  $("#filter-input").on("input", () => {
+    const searchTerm = $("#filter-input").val().trim();
+    const filteredReservations = filterReservations(searchTerm);
+    const order = $("#order-select").val();
+    const sortedReservations = sortReservations(filteredReservations, order);
+    renderTable(sortedReservations);
+  });
+
+  $("#order-select").on("change", () => {
+    const searchTerm = $("#filter-input").val().trim();
+    const filteredReservations = filterReservations(searchTerm);
+    const order = $("#order-select").val();
+    const sortedReservations = sortReservations(filteredReservations, order);
+    renderTable(sortedReservations);
+  });
+};

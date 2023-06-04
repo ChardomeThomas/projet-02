@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/style.css">
 
     <!-- Bootsrapt cdn -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
@@ -30,20 +29,24 @@
 
     <!-- sweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Document</title>
+
+    <link rel="stylesheet" href="./css/style.css">
+
+    <title>Chalet</title>
 </head>
 
 <body>
     <header>
         <!-- Login button -->
         <button id="login-btn" type="button" class="btn btn-primary" data-bs-toggle="modal"
-            data-bs-target="#exampleModal">
+            data-bs-target="#loginInterface">
             Login
         </button>
 
         <!-- Popup login -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+        <div class="modal fade" id="loginInterface" tabindex="-1" aria-labelledby="loginInterfaceLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="m-auto login-form">
@@ -59,8 +62,37 @@
                                 <input type="password" class="form-control" id="pwd" name="pwd" placeholder="Password">
                             </div>
 
-                            <div class="form-group logout-input pt-1">
-                                <p>Do you want to logout?</p>
+                            <div class="form-group admin-view pt-1">
+                                <!-- Filters -->
+                                <div class="form-group pt-1">
+                                    <label for="filter-input">Filter By:</label>
+                                    <input type="text" class="form-control" id="filter-input"
+                                        placeholder="Filter by name or email">
+                                </div>
+    
+                                <!-- Order By Date -->
+                                <div class="form-group pt-1">
+                                    <label for="order-select">Order By Date:</label>
+                                    <select id="order-select" class="form-control">
+                                        <option value="asc">Ascending</option>
+                                        <option value="desc">Descending</option>
+                                    </select>
+                                </div>
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Chalet</th>
+                                            <th scope="col">Firstname</th>
+                                            <th scope="col">Lastname</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Phone</th>
+                                            <th scope="col">N° person</th>
+                                            <th scope="col">Reservation</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="chalet-list overflow-auto h-75"></tbody>
+                                </table>
                             </div>
                             <div class="login-error"></div>
 
@@ -74,6 +106,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </header>
     <div>
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim vitae, nesciunt officia pariatur, ad aliquid
@@ -81,6 +114,7 @@
     </div>
 
 
+    <div class="chalet-card-ctn"></div>
     <div class="row mt-5 ">
         <div class="card col-2 offset-md-1 " style="width: 18rem;">
             <img class="card-img-top" src="./img/chalet1.jfif" alt="Card image cap">

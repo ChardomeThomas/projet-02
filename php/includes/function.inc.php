@@ -23,7 +23,7 @@ function login($user, $pass, $link)
             echo json_encode(array("success" => "Utilisateur OK", "user" => $user));
         } else {
             // Password verification failed
-            echo json_encode(array("error" => "Mot de passe incorrect!"));
+            echo json_encode(array("error" => "Incorrect password!"));
         }
     } else {
         echo json_encode(array("error" => "Invalid user or incorrect password!"));
@@ -40,4 +40,21 @@ function hashUserPassword($user, $pass, $link)
     $req->bind_param("ss", $hashedPassword, $user);
 
     $req->execute();
+}
+
+function fetchReservation($link)
+{
+    $req = $link->prepare("SELECT * FROM reservation");
+    $req->execute();
+    $result = $req->get_result();
+
+    if ($result->num_rows >= 1) {
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode(array("rsv" => $data));
+    } else {
+        echo json_encode(array("error" => "No data Found!"));
+    }
 }
