@@ -1,4 +1,3 @@
-
 // THOMAS : toute la journée du vendredi pour le calendrier
 //samedi: début modal calendrier en boostrap
 
@@ -6,7 +5,8 @@
 $.fn.modal.Constructor.prototype._enforceFocus = function() {};
 
 var chaletId;
-
+let isAdmin = true;
+// var today = new Date().toISOString().slice(0,10);
 document.addEventListener('DOMContentLoaded', function() {
   
 
@@ -19,9 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Utilisez l'ID pour ajouter des informations ou effectuer d'autres opérations
       console.log('Calendar ID:', chaletId);
-      event.test = chaletId;
       // ... Autres actions à effectuer avec l'ID
-      console.log(event.test);
       // Pour empêcher le comportement par défaut du bouton (comme la soumission de formulaire)
       event.preventDefault();
       
@@ -33,16 +31,20 @@ document.addEventListener('DOMContentLoaded', function() {
   var calendar = new FullCalendar.Calendar(calendarEl, {
     
     initialView: 'dayGridMonth',
-    height: 350,
+    height: 500,
     events: './php/fetchEvents.php',
     eventColor: 'red',
     selectable: true,
+    selectAllow: function(select) {
+      return moment().diff(select.start, 'days') <= 0
+   },
     select: async function (start, end, allDay) {
+      
       const { value: formValues } = await Swal.fire({
         title: 'Add Event',
         confirmButtonText: 'Submit',
         showCloseButton: true,
-		    showCancelButton: true,
+        showCancelButton: true,
         html:
           '<input id="swalEvtTitle" class="swal2-input" placeholder="Enter title">' +
           '<input id="Nom" class="swal2-input" placeholder="Entrez votre nom">'+
@@ -68,8 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById("case1").checked,
             document.getElementById("case2").checked,
             document.getElementById("case3").checked,
-            
-            
           ]
         }
       });
@@ -122,12 +122,14 @@ document.addEventListener('DOMContentLoaded', function() {
         html:`<p>${info.event.extendedProps.nom}</p><p>${info.event.extendedProps.prenom}</p><p>${info.event.extendedProps.email}</p><p>${info.event.extendedProps.telephone}</p><p>${info.event.extendedProps.personnes}</p><input disabled type="checkbox" ${breakf ? 'checked' : ''}><span>breakfast</span> <input disabled type="checkbox" ${din ? 'checked' : ''} ><span>dinner</span><input disabled type="checkbox" ${spa ? 'checked' : ''} ><span>spa</span>`,
         showCloseButton: true,
         showCancelButton: true,
-        showDenyButton: true,
+        showConfirmButton: isAdmin,
+        showDenyButton: isAdmin,
         cancelButtonText: 'Close',
-        confirmButtonText: 'Delete',
-        denyButtonText: 'Edit',
+        confirmButtonText: 'Edit',
+        denyButtonText: 'Delete',
       }).then((result) => {
-        if (result.isConfirmed) {
+        if (isAdmin) {
+        if (result.isDenied) {
           // Delete event
           fetch("./php/eventHandler.php", {
             method: "POST",
@@ -146,32 +148,36 @@ document.addEventListener('DOMContentLoaded', function() {
             calendar.refetchEvents();
           })
           .catch(console.error);
-        } else if (result.isDenied) {
+        } else if (result.isConfirmed) {
           // Edit and update event
           Swal.fire({
             title: 'Edit Event',
             html:
               '<input id="swalEvtTitle_edit" class="swal2-input" placeholder="Enter title" value="'+info.event.title+'">' +
-              // '<textarea id="swalEvtDesc_edit" class="swal2-input" placeholder="Enter description">'+info.event.extendedProps.description+'</textarea>' +
-              // '<input id="swalEvtURL_edit" class="swal2-input" placeholder="Enter URL" value="'+info.event.url+'">'+
               '<input id="swalNom_edit" class="swal2-input" placeholder="Enter Nom" value="'+info.event.extendedProps.nom+'">'+
               '<input id="swalPrenom_edit" class="swal2-input" placeholder="Enter Prenom" value="'+info.event.extendedProps.prenom+'">'+
               '<input id="swalEmail_edit" class="swal2-input" placeholder="Enter votre email" value="'+info.event.extendedProps.email+'">'+
               '<input id="swalTelephone_edit" class="swal2-input" placeholder="Enter votre telephone" value="'+info.event.extendedProps.telephone+'">'+
-              '<input id="swalPersonnes_edit" class="swal2-input" placeholder="Enter le nombre de personnes" value="'+info.event.extendedProps.personnes+'">',
+              '<input id="swalPersonnes_edit" class="swal2-input" placeholder="Enter le nombre de personnes" value="'+info.event.extendedProps.personnes+'">'+
+              '<input id="swalStart" type="date" id="start" name="trip-start value="'+info.event.extendedProps.personnes+'>'+
+              '<input id="swalEnd" type="date" id="start" name="trip-start value="'+info.event.end+'>'+
+              // '<input id="swalStatus" class="swal2-input" placeholder="choisissez le status" value="'+info.event.extendedProps.status_id+'">',
+              '<select name="status" id="swalStatus"><option value="1">waiting</option><option value="2">canceled</option><option value="3">confirmed</option><option value="4">payed</option></select>',
             focusConfirm: false,
             confirmButtonText: 'Submit',
             preConfirm: () => {
-            return [
-              document.getElementById('swalEvtTitle_edit').value,
-              // document.getElementById('swalEvtDesc_edit').value,
-              // document.getElementById('swalEvtURL_edit').value,
-              document.getElementById('swalNom_edit').value,
-              document.getElementById('swalPrenom_edit').value,
-              document.getElementById('swalEmail_edit').value,
-              document.getElementById('swalTelephone_edit').value,
-              document.getElementById('swalPersonnes_edit').value
-            ]
+              return [
+                document.getElementById('swalEvtTitle_edit').value,
+                document.getElementById('swalNom_edit').value,
+                document.getElementById('swalPrenom_edit').value,
+                document.getElementById('swalEmail_edit').value,
+                document.getElementById('swalTelephone_edit').value,
+                document.getElementById('swalPersonnes_edit').value,
+                document.getElementById('swalStart').value,
+                document.getElementById('swalEnd').value,
+                document.getElementById('swalStatus').value,
+
+              ]
             }
           }).then((result) => {
             if (result.value) {
@@ -198,12 +204,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           Swal.close();
         }
+      }
       });
     }
   });
 
   calendar.render();
-
 
   
   $('#exampleModal').on('show.bs.modal', function (event) {
@@ -212,9 +218,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
     // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
     var modal = $(this)
-    modal.find('.modal-title').text('New message to ' + recipient)
+    modal.find('.modal-title').text('Choisissez votre réservation ' + recipient)
     modal.find('.modal-body input').val(recipient)
   
   })
 });
-

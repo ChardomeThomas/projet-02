@@ -9,7 +9,8 @@ if(!empty($_GET['start']) && !empty($_GET['end'])){
 } 
  
 // Fetch events from database 
-$sql = "SELECT * FROM reservation $where_sql"; 
+// $sql = "SELECT * FROM reservation $where_sql"; 
+$sql = "SELECT * FROM reservation WHERE delete_date IS NULL"; 
 $result = $db->query($sql);  
  
 $eventsArr = array(); 
