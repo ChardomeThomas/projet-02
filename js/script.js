@@ -6,6 +6,7 @@ $.fn.modal.Constructor.prototype._enforceFocus = function() {};
 
 var chaletId;
 let isAdmin = true;
+let testCouleur;
 // var today = new Date().toISOString().slice(0,10);
 document.addEventListener('DOMContentLoaded', function() {
   
@@ -16,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     button.addEventListener('click', function(event) {
       // Récupérez l'attribut "data-id-calendar"
       chaletId = button.getAttribute('data-id-calendar');
-
+      
       // Utilisez l'ID pour ajouter des informations ou effectuer d'autres opérations
       console.log('Calendar ID:', chaletId);
       // ... Autres actions à effectuer avec l'ID
@@ -30,14 +31,41 @@ document.addEventListener('DOMContentLoaded', function() {
   
   var calendar = new FullCalendar.Calendar(calendarEl, {
     
+
+
+    
     initialView: 'dayGridMonth',
     height: 500,
     events: './php/fetchEvents.php',
-    eventColor: 'red',
     selectable: true,
+    eventDidMount: function(info) {
+      var event = info.event;
+      var chaletId = event.extendedProps.chalet_Id;
+    
+      // Définir la couleur en fonction de chaletId
+      var color ; // Couleur par défaut
+      if (chaletId === '1') {
+        color = 'green';
+      } else if (chaletId === '2') {
+        color = 'blue';
+      }else if (chaletId ==='3'){
+      color = 'red' // Ajoutez d'autres conditions pour chaque chalet_Id
+    }
+      event.setProp('backgroundColor', color);
+    },
     selectAllow: function(select) {
-      return moment().diff(select.start, 'days') <= 0
-   },
+      var eventsOnSameDay = calendar.getEvents().filter(function(event) {
+        return event.start.toISOString().slice(0, 10) === select.start.toISOString().slice(0, 10);
+      });
+  
+      if (moment().diff(select.start, 'days') > 0 || eventsOnSameDay.length >= 3) {
+        Swal.fire("Impossible de sélectionner cette case. Vérifiez que la date est future et qu'il n'y a pas déjà trois événements sur cette journée.", '', 'error');
+        return false;
+      }
+  
+      return true;
+    },
+    
     select: async function (start, end, allDay) {
       
       const { value: formValues } = await Swal.fire({
@@ -97,7 +125,20 @@ document.addEventListener('DOMContentLoaded', function() {
     },
 
     eventClick: function(info) {
+      var eventsOnSameDay = calendar.getEvents().filter(function(event) {
+        return event.start.toISOString().slice(0, 10) === info.event.start.toISOString().slice(0, 10);
+      });
+    
+      if (eventsOnSameDay.length >= 3) {
+        // Afficher un message d'erreur lorsque trois événements sont présents sur la même journée
+        Swal.fire('Impossible de sélectionner cette case. Trois événements sont déjà présents sur cette journée.', '', 'error');
+        return false; // Annuler l'action par défaut
+      }
+    
+      // Le code restant pour afficher les détails de l'événement lorsque moins de trois événements sont présents
       info.jsEvent.preventDefault();
+      // ...
+    
       if(info.event.extendedProps.breakfast==1){
         var breakf = true;
       }else{
@@ -115,11 +156,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       // change the border color
       info.el.style.borderColor = 'red';
-      
+      if (isAdmin) { //mettre en comm si on veut que les utilisateurs puissent cliquer pour voir les réservations
       Swal.fire({
         title: info.event.title,
         icon: 'info',
-        html:`<p>${info.event.extendedProps.nom}</p><p>${info.event.extendedProps.prenom}</p><p>${info.event.extendedProps.email}</p><p>${info.event.extendedProps.telephone}</p><p>${info.event.extendedProps.personnes}</p><input disabled type="checkbox" ${breakf ? 'checked' : ''}><span>breakfast</span> <input disabled type="checkbox" ${din ? 'checked' : ''} ><span>dinner</span><input disabled type="checkbox" ${spa ? 'checked' : ''} ><span>spa</span>`,
+        html:`<p>${info.event.extendedProps.nom}</p><p>${info.event.extendedProps.prenom}</p><p>${info.event.extendedProps.email}</p><p>${info.event.extendedProps.telephone}</p><p>${info.event.extendedProps.personnes}</p><input disabled type="checkbox" ${breakf ? 'checked' : ''}><span>breakfast</span> <input disabled type="checkbox" ${din ? 'checked' : ''} ><span>dinner</span><input disabled type="checkbox" ${spa ? 'checked' : ''} ><span>spa</span><p>status: ${info.event.extendedProps.status_id} (1:waiting, 2:canceled, 3:confirmed, 4:payed)</p>`,
         showCloseButton: true,
         showCancelButton: true,
         showConfirmButton: isAdmin,
@@ -128,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmButtonText: 'Edit',
         denyButtonText: 'Delete',
       }).then((result) => {
-        if (isAdmin) {
+        // if (isAdmin) { enlever le comm si on veut que les utilisateurs puissent cliquer pour voir les réservations
         if (result.isDenied) {
           // Delete event
           fetch("./php/eventHandler.php", {
@@ -159,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
               '<input id="swalEmail_edit" class="swal2-input" placeholder="Enter votre email" value="'+info.event.extendedProps.email+'">'+
               '<input id="swalTelephone_edit" class="swal2-input" placeholder="Enter votre telephone" value="'+info.event.extendedProps.telephone+'">'+
               '<input id="swalPersonnes_edit" class="swal2-input" placeholder="Enter le nombre de personnes" value="'+info.event.extendedProps.personnes+'">'+
-              '<input id="swalStart" type="date" id="start" name="trip-start value="'+info.event.extendedProps.personnes+'>'+
+              '<input id="swalStart" type="date" id="start" name="trip-start value="'+info.event.start+'>'+
               '<input id="swalEnd" type="date" id="start" name="trip-start value="'+info.event.end+'>'+
               // '<input id="swalStatus" class="swal2-input" placeholder="choisissez le status" value="'+info.event.extendedProps.status_id+'">',
               '<select name="status" id="swalStatus"><option value="1">waiting</option><option value="2">canceled</option><option value="3">confirmed</option><option value="4">payed</option></select>',
@@ -204,10 +245,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           Swal.close();
         }
-      }
+      // } enlever le com si on veut que les utilisateurs puissent cliquer sur les réservations
       });
+    } //à mettre en com si on veut que les utilisateurs puissent cliquer sur les réservation
     }
+    
   });
+
 
   calendar.render();
 
@@ -221,5 +265,4 @@ document.addEventListener('DOMContentLoaded', function() {
     modal.find('.modal-title').text('Choisissez votre réservation ' + recipient)
     modal.find('.modal-body input').val(recipient)
   
-  })
-});
+  })});

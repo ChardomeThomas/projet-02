@@ -10,14 +10,17 @@ if(!empty($_GET['start']) && !empty($_GET['end'])){
  
 // Fetch events from database 
 // $sql = "SELECT * FROM reservation $where_sql"; 
-$sql = "SELECT * FROM reservation WHERE delete_date IS NULL"; 
+$sql = "SELECT *, chalet_Id FROM reservation WHERE delete_date IS NULL";
+// $sql = "SELECT * FROM reservation WHERE delete_date IS NULL"; 
 $result = $db->query($sql);  
  
 $eventsArr = array(); 
 if($result->num_rows > 0){ 
-    while($row = $result->fetch_assoc()){ 
-        array_push($eventsArr, $row); 
-    } 
+    while ($row = $result->fetch_assoc()) {
+        $row['chalet_Id'] = $row['chalet_Id']; 
+        array_push($eventsArr, $row);
+    }
+    
 } 
 echo json_encode($eventsArr);
 
