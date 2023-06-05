@@ -112,7 +112,7 @@ const adminView = () => {
 
     filteredReservations.map((rsv) => {
       tableBody.append(`
-        <tr>
+        <tr data-client-id=${rsv.id}>
           <td>${rsv.c_name}</td>
           <td>${rsv.prenom}</td>
           <td>${rsv.nom}</td>

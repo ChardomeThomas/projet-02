@@ -2,6 +2,7 @@
 <?php      
 // Include database configuration file  
 require_once 'dbConfig.php'; 
+include 'includes/dbo.inc.php';
 // var_dump($chaletId);
 $where_sql = ''; 
 if(!empty($_GET['start']) && !empty($_GET['end'])){ 
@@ -12,7 +13,7 @@ if(!empty($_GET['start']) && !empty($_GET['end'])){
 // $sql = "SELECT * FROM reservation $where_sql"; 
 $sql = "SELECT *, chalet_Id FROM reservation WHERE delete_date IS NULL";
 // $sql = "SELECT * FROM reservation WHERE delete_date IS NULL"; 
-$result = $db->query($sql);  
+$result = $link->query($sql);  
  
 $eventsArr = array(); 
 if($result->num_rows > 0){ 

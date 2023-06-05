@@ -84,34 +84,15 @@ document.addEventListener('DOMContentLoaded', function() {
       event.setProp('backgroundColor', color);
     },
     selectAllow: function(select) {
-    //   var eventsOnSameDay = calendar.getEvents().filter(function(event) {
-    //     return event.start.toISOString().slice(0, 10) === select.start.toISOString().slice(0, 10);
-    //   });
-    //   if(!isAdmin){
-    //   if (moment().diff(select.start, 'days') > 0 || eventsOnSameDay.length >= 3) {
-    //     Swal.fire("Impossible de sélectionner cette case. Vérifiez que la date est future et qu'il n'y a pas déjà trois événements sur cette journée.", '', 'error');
-    //     return false;
-    //   }
-    // }
-    var eventsOnSameDay = calendar.getEvents().filter(function(event) {
-      var eventStart = moment(event.start).startOf('day');
-      var eventEnd = moment(event.end).startOf('day');
-      var selectedDate = moment(select.start).startOf('day');
-      return (eventStart.isSameOrBefore(selectedDate) && eventEnd.isSameOrAfter(selectedDate));
-    });
-    
-    if (!isAdmin) {
-      if (moment().isAfter(select.start, 'day')) {
-        Swal.fire("Impossible de sélectionner cette case. Vérifiez que la date est future.", '', 'error');
-        return false;
-      }
-    
-      if (eventsOnSameDay.length >= 3) {
-        Swal.fire("Impossible de sélectionner cette case. Il y a déjà trois événements sur cette journée.", '', 'error');
+      var eventsOnSameDay = calendar.getEvents().filter(function(event) {
+        return event.start.toISOString().slice(0, 10) === select.start.toISOString().slice(0, 10);
+      });
+      if(!isAdmin){
+      if (moment().diff(select.start, 'days') > 0 || eventsOnSameDay.length >= 3) {
+        Swal.fire("Impossible de sélectionner cette case. Vérifiez que la date est future et qu'il n'y a pas déjà trois événements sur cette journée.", '', 'error');
         return false;
       }
     }
-    
       return true;
     },
     

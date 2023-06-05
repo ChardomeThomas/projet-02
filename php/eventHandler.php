@@ -1,8 +1,9 @@
+
 <?php 
-   
+//Thomas   
 // Include database configuration file  
-require_once 'dbConfig.php'; 
- 
+// require_once 'dbConfig.php'; 
+ include 'includes/dbo.inc.php';
 // Retrieve JSON from POST body 
 $jsonStr = file_get_contents('php://input'); 
 $jsonObj = json_decode($jsonStr); 
@@ -27,7 +28,7 @@ if($jsonObj->request_type == 'addEvent'){
     if(!empty($eventTitle)){ 
         // Insert event data into the database 
         $sqlQ = "INSERT INTO reservation (title,nom,prenom,email,telephone,personnes,chalet_id,start,end, breakfast, dinner, spa, status_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"; 
-        $stmt = $db->prepare($sqlQ); 
+        $stmt = $link->prepare($sqlQ); 
         $stmt->bind_param("sssssiissiiii", $eventTitle, $eventNom, $eventPrenom,  $eventMail, $eventTelephone, $eventPersonnes, $eventChalet, $start, $end,  $eventbreakfast, $eventDinner,$eventspa, $eventstatusId ); 
         $insert = $stmt->execute(); 
  
@@ -62,7 +63,7 @@ if($jsonObj->request_type == 'addEvent'){
     if(!empty($eventTitle)){ 
         // Update event data into the database 
         $sqlQ = "UPDATE reservation SET title=?,nom=?,prenom=?,email=?,telephone=?,personnes=?,start=?,end=?,status_id=? WHERE id=?"; 
-        $stmt = $db->prepare($sqlQ); 
+        $stmt = $link->prepare($sqlQ); 
         $stmt->bind_param("sssssissii", $eventTitle, $eventNom, $eventPrenom, $eventMail, $eventTelephone, $eventPersonnes, $eventStart, $eventEnd, $eventStatus, $event_id); 
         $update = $stmt->execute(); 
  
@@ -80,7 +81,7 @@ if($jsonObj->request_type == 'addEvent'){
  
     // $sql = "DELETE FROM reservation WHERE id=$id"; 
     $sql = "UPDATE reservation SET delete_date =  CURRENT_TIMESTAMP() WHERE id=$id"; 
-    $delete = $db->query($sql); 
+    $delete = $link->query($sql); 
     if($delete){ 
         $output = [ 
             'status' => 1 
