@@ -1,8 +1,7 @@
 
 <?php 
 //Thomas   
-// Include database configuration file  
-// require_once 'dbConfig.php'; 
+
  include 'includes/dbo.inc.php';
 // Retrieve JSON from POST body 
 $jsonStr = file_get_contents('php://input'); 
@@ -42,14 +41,12 @@ if($jsonObj->request_type == 'addEvent'){
         } 
     } 
 }elseif($jsonObj->request_type == 'editEvent'){ 
-    // $start = $jsonObj->start; 
-    // $end = $jsonObj->end; 
+
     $event_id = $jsonObj->event_id; 
  
     $event_data = $jsonObj->event_data; 
     $eventTitle = !empty($event_data[0])?$event_data[0]:''; 
-    // $eventDesc = !empty($event_data[1])?$event_data[1]:''; 
-    // $eventURL = !empty($event_data[2])?$event_data[2]:''; 
+
     $eventNom = !empty($event_data[1])?$event_data[1]:''; 
     $eventPrenom = !empty($event_data[2])?$event_data[2]:''; 
     $eventMail = !empty($event_data[3])?$event_data[3]:'';

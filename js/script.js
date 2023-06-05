@@ -34,7 +34,6 @@ function getSessionId() {
 //permet de perdre le focus sur le modal bootstrap afin de pouvoir remplir les input du calendrier
 $.fn.modal.Constructor.prototype._enforceFocus = function() {};
 
-// var today = new Date().toISOString().slice(0,10);
 document.addEventListener('DOMContentLoaded', function() {
   
 
@@ -45,11 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
       getSessionId();
       // Récupérez l'attribut "data-id-calendar"
       chaletId = button.getAttribute('data-id-calendar');
-      // Utilisez l'ID pour ajouter des informations ou effectuer d'autres opérations
       console.log('Calendar ID:', chaletId);
       
-      // ... Autres actions à effectuer avec l'ID
-      // Pour empêcher le comportement par défaut du bouton (comme la soumission de formulaire)
       event.preventDefault();
       
     });
@@ -275,10 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   
   $('#exampleModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var recipient = button.data('whatever') // Extract info from data-* attributes
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var button = $(event.relatedTarget) 
+    var recipient = button.data('whatever') 
+   
     var modal = $(this)
     modal.find('.modal-title').text('Choisissez votre réservation ' + recipient)
     modal.find('.modal-body input').val(recipient)

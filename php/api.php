@@ -11,7 +11,6 @@ switch ($_POST["action"]) {
         $pwd = $_POST["pwd"];
 
         login($username, $pwd, $link);
-        // $userId = login($username, $pwd, $link);
         break;
 
         // Fred
