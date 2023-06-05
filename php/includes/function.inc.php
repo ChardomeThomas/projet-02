@@ -19,7 +19,7 @@ function login($user, $pass, $link)
         $user = $result->fetch_assoc();
         if (password_verify($pass, $user["password"])) {
             // Password verification successful
-            $_SESSION["ID_user"] = $user["id"];
+            $_SESSION["id_user"] = $user["id"];
             echo json_encode(array("success" => "Utilisateur OK", "user" => $user));
         } else {
             // Password verification failed

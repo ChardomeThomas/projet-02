@@ -1,25 +1,53 @@
 // THOMAS : toute la journée du vendredi pour le calendrier
 //samedi: début modal calendrier en boostrap
+//dimanche
+var sessionId;
+var chaletId;
+let isAdmin = false;
+
+$("#login-submit").on("click", () => {
+  getSessionId();
+  
+});
+// récupération de id_user dans la session
+function getSessionId() {
+  $.ajax({
+    url: './php/api.php',
+    type: 'POST',
+    data: { action: 'session' },
+    dataType: 'json',
+    success: function(response) {
+      sessionId = response.session;
+      console.log('ID de l\'utilisateur : ' + sessionId);
+      if(!isNaN(sessionId)){
+        isAdmin = true;
+      }else{
+        isAdmin = false;
+      }
+    },
+    error: function(xhr, status, error) {
+      console.log('Erreur : ' + error);
+    }
+  });
+}
 
 //permet de perdre le focus sur le modal bootstrap afin de pouvoir remplir les input du calendrier
 $.fn.modal.Constructor.prototype._enforceFocus = function() {};
 
-var chaletId;
-let isAdmin = true;
-let testCouleur;
 // var today = new Date().toISOString().slice(0,10);
 document.addEventListener('DOMContentLoaded', function() {
   
 
   var buttons = document.querySelectorAll('.cal');
-  // Parcourez chaque bouton et ajoutez un gestionnaire d'événements click
+  // Parcourir chaque bouton et ajoutez un gestionnaire d'événements click
   buttons.forEach(function(button) {
     button.addEventListener('click', function(event) {
+      getSessionId();
       // Récupérez l'attribut "data-id-calendar"
       chaletId = button.getAttribute('data-id-calendar');
-      
       // Utilisez l'ID pour ajouter des informations ou effectuer d'autres opérations
       console.log('Calendar ID:', chaletId);
+      
       // ... Autres actions à effectuer avec l'ID
       // Pour empêcher le comportement par défaut du bouton (comme la soumission de formulaire)
       event.preventDefault();
@@ -31,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   var calendar = new FullCalendar.Calendar(calendarEl, {
     
-
+    
 
     
     initialView: 'dayGridMonth',
@@ -42,27 +70,48 @@ document.addEventListener('DOMContentLoaded', function() {
       var event = info.event;
       var chaletId = event.extendedProps.chalet_Id;
     
-      // Définir la couleur en fonction de chaletId
-      var color ; // Couleur par défaut
+
+      var color ; 
+
+
       if (chaletId === '1') {
         color = 'green';
       } else if (chaletId === '2') {
         color = 'blue';
       }else if (chaletId ==='3'){
-      color = 'red' // Ajoutez d'autres conditions pour chaque chalet_Id
+      color = 'red' 
     }
       event.setProp('backgroundColor', color);
     },
     selectAllow: function(select) {
-      var eventsOnSameDay = calendar.getEvents().filter(function(event) {
-        return event.start.toISOString().slice(0, 10) === select.start.toISOString().slice(0, 10);
-      });
-  
-      if (moment().diff(select.start, 'days') > 0 || eventsOnSameDay.length >= 3) {
-        Swal.fire("Impossible de sélectionner cette case. Vérifiez que la date est future et qu'il n'y a pas déjà trois événements sur cette journée.", '', 'error');
+    //   var eventsOnSameDay = calendar.getEvents().filter(function(event) {
+    //     return event.start.toISOString().slice(0, 10) === select.start.toISOString().slice(0, 10);
+    //   });
+    //   if(!isAdmin){
+    //   if (moment().diff(select.start, 'days') > 0 || eventsOnSameDay.length >= 3) {
+    //     Swal.fire("Impossible de sélectionner cette case. Vérifiez que la date est future et qu'il n'y a pas déjà trois événements sur cette journée.", '', 'error');
+    //     return false;
+    //   }
+    // }
+    var eventsOnSameDay = calendar.getEvents().filter(function(event) {
+      var eventStart = moment(event.start).startOf('day');
+      var eventEnd = moment(event.end).startOf('day');
+      var selectedDate = moment(select.start).startOf('day');
+      return (eventStart.isSameOrBefore(selectedDate) && eventEnd.isSameOrAfter(selectedDate));
+    });
+    
+    if (!isAdmin) {
+      if (moment().isAfter(select.start, 'day')) {
+        Swal.fire("Impossible de sélectionner cette case. Vérifiez que la date est future.", '', 'error');
         return false;
       }
-  
+    
+      if (eventsOnSameDay.length >= 3) {
+        Swal.fire("Impossible de sélectionner cette case. Il y a déjà trois événements sur cette journée.", '', 'error');
+        return false;
+      }
+    }
+    
       return true;
     },
     
@@ -125,19 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
     },
 
     eventClick: function(info) {
-      var eventsOnSameDay = calendar.getEvents().filter(function(event) {
-        return event.start.toISOString().slice(0, 10) === info.event.start.toISOString().slice(0, 10);
-      });
-    
-      if (eventsOnSameDay.length >= 3) {
-        // Afficher un message d'erreur lorsque trois événements sont présents sur la même journée
-        Swal.fire('Impossible de sélectionner cette case. Trois événements sont déjà présents sur cette journée.', '', 'error');
-        return false; // Annuler l'action par défaut
-      }
-    
-      // Le code restant pour afficher les détails de l'événement lorsque moins de trois événements sont présents
-      info.jsEvent.preventDefault();
-      // ...
+     
     
       if(info.event.extendedProps.breakfast==1){
         var breakf = true;
