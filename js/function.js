@@ -21,6 +21,7 @@ $(document).ready(() => {
         $("#modal-ctn").addClass("modal-fullscreen")
         $(".login-input").hide();
         $(".admin-view").show();
+        adminView();
       }
     },
     "json"
