@@ -20,5 +20,6 @@ fetch('./php/chalets.php')
     }
   })
   .catch(error => {
+    // Gérez les erreurs ici
     console.error('Erreur lors de la récupération des données JSON:', error);
   });

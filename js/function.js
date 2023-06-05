@@ -112,16 +112,16 @@ const adminView = () => {
 
     filteredReservations.map((rsv) => {
       tableBody.append(`
-        <tr data-client-id=${rsv.id}>
+        <tr >
           <td>${rsv.c_name}</td>
           <td>${rsv.prenom}</td>
           <td>${rsv.nom}</td>
           <td>${rsv.email}</td>
           <td>${rsv.telephone}</td>
           <td>${rsv.personnes}</td>
-          <td><input class="form-check-input m-auto" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.breakfast ? "checked" : ""} disabled></td>
-          <td><input class="form-check-input m-auto" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.dinner ? "checked" : ""} disabled></td>
-          <td><input class="form-check-input m-auto" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.spa ? "checked" : ""} disabled></td>
+          <td><input class="form-check-input" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.breakfast ? "checked" : ""} disabled></td>
+          <td><input class="form-check-input" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.dinner ? "checked" : ""} disabled></td>
+          <td><input class="form-check-input" type="checkbox" value="" id="flexCheckCheckedDisabled" ${rsv.spa ? "checked" : ""} disabled></td>
           <td>${rsv.start}</td>
           <td>${rsv.creation_date}</td>
           <td>${rsv.status}</td>

@@ -1,7 +1,6 @@
 
 <?php      
 // Include database configuration file  
-require_once 'dbConfig.php'; 
 include 'includes/dbo.inc.php';
 $where_sql = ''; 
 if(!empty($_GET['start']) && !empty($_GET['end'])){ 
