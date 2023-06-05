@@ -20,8 +20,6 @@ switch ($_POST["action"]) {
         else {
             if (isset($_SESSION["id_user"]))
                 echo json_encode(array("session" => $_SESSION["id_user"]), true);
-            else if (isset($_COOKIE["id_user"]))
-                echo json_encode(array("session" => $_COOKIE["id_user"]), true);
         }
         break;
 
