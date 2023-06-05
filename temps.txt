@@ -1,0 +1,8 @@
+Fred:
+filtres+Affichage admin: 3h
+sorting: 3h
+login: 1h
+php: 30min
+Thomas:
+affichage chalet pas accueil: 1h
+calendrier (affichage, suppression, modification): 12h
