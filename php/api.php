@@ -10,8 +10,8 @@ switch ($_POST["action"]) {
         $username = $_POST["username"];
         $pwd = $_POST["pwd"];
 
-        // login($username, $pwd, $link);
-        $userId = login($username, $pwd, $link);
+        login($username, $pwd, $link);
+        // $userId = login($username, $pwd, $link);
         break;
 
         // Fred
