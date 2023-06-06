@@ -6,5 +6,5 @@ You can click again to sort on the opposite direction.
 
 
 exp:
-* click on Lastname column head to sort all the line alphabetically by last name
+* click on Lastname's column head to sort all the lines alphabetically by last name
 * click again to sort in the opposite direction
