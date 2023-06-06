@@ -1,4 +1,4 @@
-# projet-02
+# Sorting
 
 
 To sort elements in the admin view, you simply need to click on the table head of the element you want sorted.
